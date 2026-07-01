@@ -21,21 +21,7 @@ def verify_stats():
     print(f"Retention from 2nd to 3rd visit: {retention_2_to_3:.2f}%")
     print(f"Overall retention for 3rd visit (of all who visited): {overall_retention_3:.2f}%")
     
-    # 2. Percentage of high-risk participants (Score 2 or 3)
-    # The user says "about 6% of the kids are in a high-risk group."
-    high_risk_count = (df['RiskScore'] >= 2).sum()
-    total_kids = len(df)
-    high_risk_pct = (high_risk_count / total_kids) * 100
-    print(f"High-Risk Group Percentage (Score >= 2): {high_risk_pct:.2f}%")
-    
-    # 3. Average visits for high-risk vs low-risk
-    # The user says "students labeled as high-risk are actually the ones who show up the most often."
-    avg_visits_high = df[df['RiskScore'] >= 2]['TotalVisits'].mean()
-    avg_visits_low = df[df['RiskScore'] < 2]['TotalVisits'].mean()
-    print(f"Avg Visits (High Risk Score >= 2): {avg_visits_high:.2f}")
-    print(f"Avg Visits (Low Risk Score < 2): {avg_visits_low:.2f}")
-    
-    # 4. Average visits for economically disadvantaged vs others
+    # 2. Average visits for economically disadvantaged vs others
     # The user says "5.7 visits on average compared to 1.7"
     if 'HouseholdEconomicStatus' in df.columns:
         avg_econ = df[df['HouseholdEconomicStatus'] == 'Economically Disadvantaged']['TotalVisits'].mean()
@@ -43,7 +29,7 @@ def verify_stats():
         print(f"Avg Visits (Economically Disadvantaged): {avg_econ:.2f}")
         print(f"Avg Visits (Others): {avg_other:.2f}")
     
-    # 5. Seasonality/Club breakdown
+    # 3. Seasonality/Club breakdown
     # (Just a peek at the clubs)
     if 'OrganizationName' in df.columns:
         print("\nClub Counts:")

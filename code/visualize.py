@@ -68,24 +68,6 @@ def plot_retention_cliff(ax, data):
         ax.annotate(f'{p.get_height():.0f}%', (p.get_x() + p.get_width() / 2., p.get_height()), 
                     ha='center', va='center', xytext=(0, 9), textcoords='offset points', fontsize=12, fontweight='bold')
 
-def plot_risk_definitions(ax, data):
-    sns.countplot(data=data, x='RiskScore', hue='RiskScore', palette=PALETTE[:4], ax=ax, legend=False)
-    ax.set_xlabel('Risk Score (Count of Factors)', fontsize=14, fontweight='bold')
-    ax.set_ylabel('Participant Count', fontsize=14, fontweight='bold')
-    risk_text = "Risk Factors (Score +1 each):\n• Income < $25,000\n• Household Size > 4\n• Attendance < 5 visits"
-    ax.text(0.95, 0.95, risk_text, transform=ax.transAxes, fontsize=14, verticalalignment='top', horizontalalignment='right',
-            bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, edgecolor='#1D3557'))
-    for p in ax.patches:
-        height = p.get_height()
-        ax.annotate(f'{int(height)}', (p.get_x() + p.get_width() / 2., height), 
-                    ha='center', va='center', xytext=(0, 9), textcoords='offset points', fontsize=12, fontweight='bold')
-
-def plot_correlation_heatmap(ax, data):
-    corr_cols = ['EconomicRisk', 'HouseholdRisk', 'AttendanceRisk', 'TotalVisits']
-    corr_matrix = data[corr_cols].corr()
-    sns.heatmap(corr_matrix, annot=True, cmap='RdBu_r', center=0, fmt=".2f", ax=ax, cbar=False)
-    ax.set_title('Strength of Relationship (Risk Factors)', fontsize=12, style='italic', pad=10)
-
 def plot_equity_gap(ax, data):
     econ_df = data[data['HouseholdEconomicStatus'].isin(['Economically Disadvantaged', 'Not Economically Disadvantaged'])].copy()
     means = econ_df.groupby('HouseholdEconomicStatus')['TotalVisits'].mean().reset_index()
@@ -144,25 +126,9 @@ def run_visuals():
         plot_retention_cliff, ret_df
     )
 
-    # Slide 4: Risk Score (Shifted from 3)
+    # Slide 4: Equity Gap
     create_slide(
-        'slide4_risk_defined.png',
-        'Risk Score', 'Targeting Support',
-        "A 3-factor risk score (Income, Household, Attendance) identifies the 6% of students needing extra support. This data-driven approach allows BGCDC to focus scholarships and transportation on the highest-need participants first.",
-        plot_risk_definitions, df
-    )
-
-    # Slide 5: Predictors of Disengagement (Shifted from 4)
-    create_slide(
-        'slide5_disengagement_predictors.png',
-        'Predictors of', 'Disengagement',
-        "Correlation analysis helps us understand 'Why' kids might leave. Factors like lower economic status and larger household sizes are moderately linked to lower visit frequencies. Understanding these predictors allows BGCDC to move from reactive follow-ups to predictive support.",
-        plot_correlation_heatmap, df
-    )
-
-    # Slide 6: Equity Gap (Shifted from 5)
-    create_slide(
-        'slide6_equity_gap.png',
+        'slide4_equity_gap.png',
         'Equity', 'Reducing Access Gaps',
         "Kids from lower-income backgrounds use the club almost 3x more often (5.7 vs 1.7 visits). BGCDC is successfully reaching those who need it most. The future challenge is ensuring staffing and resources can support this high usage.",
         plot_equity_gap, df

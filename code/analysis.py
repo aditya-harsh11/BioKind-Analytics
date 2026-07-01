@@ -40,37 +40,20 @@ def load_and_process():
     club_monthly.to_csv(CLUB_MONTHLY_PATH, index=False)
     print(f"Saved monthly club trends to {CLUB_MONTHLY_PATH}")
 
-    # --- IDEA 11: Calculate Risk Metrics ---
-    print("Processing Idea 11 (High-Risk Identification)...")
-    
+    # --- Merge attendance outcomes into membership records ---
+    print("Merging attendance outcomes into membership records...")
+
     # Calculate attendance frequency per participant
     att_freq = df_att.groupby('ParticipantNumber').size().reset_index(name='TotalVisits')
-    
+
     # First visit date for cohort analysis
     first_visits = df_att.groupby('ParticipantNumber')['AttendanceDate'].min().reset_index(name='FirstVisitDate')
-    
+
     # Merge with Membership
     df_merged = pd.merge(df_mem, att_freq, on='ParticipantNumber', how='left')
     df_merged = pd.merge(df_merged, first_visits, on='ParticipantNumber', how='left')
     df_merged['TotalVisits'] = df_merged['TotalVisits'].fillna(0)
 
-    # Risk Scoring Logic
-    # 1. Economic Risk
-    df_merged['EconomicRisk'] = (
-        (df_merged['HouseholdEconomicStatus'] == 'Economically Disadvantaged') | 
-        (df_merged['IncomeCategory'] == '$24,999 and under')
-    ).astype(int)
-    
-    # 2. Household Risk
-    df_merged['HouseholdRisk'] = (df_merged['TotalInHousehold'] > 4).astype(int)
-    
-    # 3. Attendance Risk
-    # We'll define "Low Attendance" as < 5 visits
-    df_merged['AttendanceRisk'] = ((df_merged['TotalVisits'] > 0) & (df_merged['TotalVisits'] < 5)).astype(int)
-    
-    # Total Risk Score
-    df_merged['RiskScore'] = df_merged['EconomicRisk'] + df_merged['HouseholdRisk'] + df_merged['AttendanceRisk']
-    
     df_merged.to_csv(PROCESSED_DATA_PATH, index=False)
     print(f"Saved processed engagement data to {PROCESSED_DATA_PATH}")
 
